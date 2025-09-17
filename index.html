@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MarkingHub</title>
+<style>
+  :root{
+    --cell: 200px; --gap: 60px;   /* шаг сетки - увеличено для большего отступа */
+    --w: 220px; --h: 120px;      /* размер узла - увеличено для большего отступа */
+    --stroke:#8a8a8a; --r:16px;  /* стиль линий/рамок */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#f6f8fa;font:14px/1.35 system-ui,Segoe UI,Arial; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow: auto; text-align: center}
+#board{
+  position:relative; width: 1600px; height: 1600px; max-width: 95vw; max-height:200vh; border-radius:20px;
+  background-image:
+    linear-gradient(#ffffff00 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff00 1px,transparent 1px);
+  background-size: calc(var(--cell)+var(--gap)) calc(var(--cell)+var(--gap));
+  box-shadow: 0 6px 30px rgba(147, 147, 147, 0.12);
+  margin: 20px auto; /* Увеличенные отступы и центрирование для board */
+}
+  svg.wires{position:absolute; inset:0; pointer-events: none; z-index: 0}
+
+  .node{
+    position:absolute; width:var(--w); height:var(--h); background:#fff;
+    border:2px solid var(--stroke); border-radius:var(--r);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:600; color:#3a3a3a;
+    text-align: center;
+    padding: 2px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow: hidden;
+    line-height: 1.5;
+    font-size: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.15);
+  }
+    /* Исключения с меньшим padding и размером текста */
+  .node:not(#q1):not(#w1):not(#e1):not(#r1):not(#a1):not(#s1):not(#d1):not(#f1):not(#center) {
+    font-size: 12px;
+  }
+  
+  /* Блоки с высотой 100px */
+  #q1, #w1, #e1, #r1, #a1, #s1, #d1, #f1 {
+    height: 100px;
+    
+  }
+    /* Блоки с высотой 100px */
+  #q2, #w2, #e2, #r2, #a2, #s2, #d2, #f2 {
+    height: 100px;
+  }
+  
+  /* Блоки с шириной 170px */
+  #x1, #c1, #v1, #x2, #c2, #v2, #x3, #c3, #v3 {
+    width: 170px;
+  }
+</style>
+</head>
+<body>
+<div id="board">
+  <svg class="wires" id="wires"></svg>
+
+  <!-- ===== РАБОЧИЕ КНОПКИ ВЕРХ ===== -->
+  <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 10;">
+    <button onclick="window.location.href='https://forms.clickup.com/9012004090/f/8cjgh7u-5532/GDFERC05MBEHE67XDW'" style="padding: 14px 28px; background: #0056b3; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,86,179,0.3);">Проблемний товар</button>
+    <button onclick="window.location.href='https://forms.clickup.com/9012004090/f/8cjgh7u-4372/JSP317572APJJHCKWI'" style="padding: 14px 28px; background: #0056b3; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,86,179,0.3);">Створити товар (Надлишок)</button>
+    <button onclick="window.location.href='https://forms.clickup.com/9012004090/f/8cjgh7u-4452/MYCVRASG1Y12PR9K5G'" style="padding: 14px 28px; background: #0056b3; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,86,179,0.3);">Створити товар (Уцінка)</button>
+  </div>
+
+  <style>
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+  </style>
+
+  <!-- ===== ВЕРХ (выровнано по колонкам) ===== -->
+  <!-- колонки: 1(q), 3(w), 5(e), 7(r) — оставил равные шаги -->
+  <div class="node" id="q2" style="left: 230px;  top:250px;">q2 Після завершення натискаємо кнопку "Провести та закрити"</div>
+  <div class="node" id="w2" style="left: 490px; top:250px;">w2 Після завершення натискаємо кнопку "Провести"</div>
+  <div class="node" id="e3" style="left: 750px; top:110px;">e3 Надрукувати артикул та внести його в 1С: кнопка "Оприбуткувати надлишок" → кнопка (+) → вписати артикул і к-сть товару</div>
+  <div class="node" id="r3" style="left: 1010px; top:110px;">r3 Сповістити менеджера по закупках  (форма "Проблемний товар")</div>
+  <div class="node" id="e2" style="left: 750px; top:250px;">e2 Якщо товару прийшло більше ніж замовляли</div>
+  <div class="node" id="r2" style="left: 1010px; top:250px;">r2 Якщо товар вказаний в накладній, а по факту його немає (за умови що всі місця приїхали) </div>
+
+  <div class="node" id="q1" style="left: 230px;  top:370px;">q1 Якщо приїхали
+всі місця</div>
+  <div class="node" id="w1" style="left: 490px; top:370px;">w1 Якщо ще чекаємо на товар</div>
+  <div class="node" id="e1" style="left: 750px; top:370px;">e1 Надлишок</div>
+  <div class="node" id="r1" style="left: 1010px; top:370px;">r1 Нестача</div>
+
+  <div class="node" id="center" style="left: 630px; top:580px; width:280px; height:40px;">Маркування товарів</div>
+
+  <!-- ===== НИЖЕ center (строго по колонкам a/s/d/f) ===== -->
+  <div class="node" id="a1" style="left:230px; top:715px;">a1 Товар пошкоджено</div>
+  <div class="node" id="s1" style="left:490px; top:715px;">s1 Не повний комплект</div>
+  <div class="node" id="d1" style="left:750px; top:715px;">d1 Товар на фото</div>
+  <div class="node" id="f1" style="left:1010px; top:715px;">f1 Прийшов не той товар</div>
+
+  <div class="node" id="a2" style="left:230px; top:835px;">a2  Брак при литті, подряпини, сколи
+пошкодження кріплень тощо</div>
+  <div class="node" id="s2" style="left:490px; top:835px;">s2  Не повна комплектація (якщо на сайті постач. назва і фото без змін)</div>
+  <div class="node" id="d2" style="left:750px; top:835px;">d2  Синя підсвітка під час маркування</div>
+  <div class="node" id="f2" style="left:1010px; top:835px;">f2 Інший колір, характеристики, фото на сайті відрізняється з тим що прийшло по факту</div>
+
+  <div class="node" id="z1" style="left:370px; top:960px;">z1 Сповістити менед- жера по закупках (форма "Проблемний товар")</div>
+  <div class="node" id="f3" style="left:1010px; top:960px;">f3 Сповістити менед- жера по закупках (форма "Проблемний товар")</div>
+  <div class="node" id="f4" style="left:1010px; top:1100px; width:220px; height:80px;">f4 Комірка NT-1-001</div>
+
+  <!-- Колонки x / c / v (ровные столбы) -->
+  <div class="node" id="x1" style="left:195px; top:1100px;">x1 Якщо вартість пошкодженого товару нижче 100 грн</div>
+  <div class="node" id="c1" style="left:395px; top:1100px;">c1 Якщо товар від постач, яким оформляється повернення: MCG (11), SKS (12), ANK (13), ТАТА (14)</div>
+  <div class="node" id="v1" style="left:595px; top:1100px;">v1 Якщо немає можливості зробити повернення заповнюємо форму "Створити уцінку"</div>
+
+  <div class="node" id="x2" style="left:195px; top:1225px; height:80px;">x2 Комірка "Запчастини < 100 грн" (без ТЗД)</div>
+  <div class="node" id="c2" style="left:395px; top:1225px; height:80px;">c2 Комірка "PO-1-001" або "NK-1-001" відповідно</div>
+  <div class="node" id="v2" style="left:595px; top:1225px; height:80px;">v2 Комірка "PН-1-001"</div>
+
+  <div class="node" id="x3" style="left:195px; top:1310px; height:80px;">x3 Утилізація</div>
+  <div class="node" id="c3" style="left:395px; top:1310px; height:80px;">c3 Повернення постачальнику</div>
+  <div class="node" id="v3" style="left:595px; top:1310px; height:80px;">v3 Продаж</div>
+</div>
+
+<script>
+const board = document.getElementById('board');
+const svg   = document.getElementById('wires');
+
+/* Ребра — в точности как на твоём скрине:
+   q1,w1,e1,r1 → center;
+   e1→e2→e3 и r1→r2→r3;
+   center → a1, s1, d1, f1;
+   a1→a2→z1, s1→s2→z1, d1→d2→z1;
+   z1 → x1,c1,v1 и вниз по колонкам;
+   f2→f3→f4 (вертикальная правая цепочка). */
+const edges = [
+  // верх → центр (со стрелками)
+  ['center','q1'], ['center','w1'], ['center','e1'], ['center','r1'],
+  // вертикали вверху
+  ['q1','q2'], // со стрелками
+  ['w1','w2'], // со стрелками
+  ['e2','e3'], // без стрелок
+  ['r2','r3'], // без стрелок
+  // центр → ряд a/s/d/f (со стрелками)
+  ['center','a1'], ['center','s1'], ['center','d1'], ['center','f1'],
+  // вниз к z1 и правой цепочке f
+  ['a2','z1'], // со стрелками
+  ['s2','z1'], // со стрелками
+  ['f2','f3'], // со стрелками
+  ['f3','f4'], // со стрелками
+  // L-образное соединение от d2 до v2 (без стрелок)
+  ['d2','v2'],
+  // разветвление от z1
+  ['z1','x1'], // со стрелками
+  ['z1','c1'], // со стрелками
+  ['z1','v1'], // со стрелками
+  ['x1','x2'], // без стрелок
+  ['x2','x3'], // без стрелок
+  ['z1','c2'], // без стрелок
+  ['c1','c2'], // без стрелок
+  ['c2','c3'], // без стрелок
+  ['v1','v2'], // без стрелок
+  ['v2','v3'], // без стрелок
+];
+
+function center(el){
+  const a = el.getBoundingClientRect(), b = board.getBoundingClientRect();
+  return { x: a.left - b.left + a.width/2, y: a.top - b.top + a.height/2 };
+}
+
+// простая прямая линия
+function straight(A,B){
+  const p1 = center(A), p2 = center(B);
+  const d = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke','var(--stroke)');
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-opacity','0.95');
+  return path;
+}
+
+// L-образная линия наоборот (сначала вниз, потом влево)
+function lShapeReverse(A,B){
+  const p1 = center(A), p2 = center(B);
+  const d = `M ${p1.x} ${p1.y} L ${p1.x} ${p2.y} L ${p2.x} ${p2.y}`;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke','var(--stroke)');
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-opacity','0.95');
+  return path;
+}
+
+// функция для получения точки пересечения с границей блока
+function getBorderIntersection(A, B) {
+  const a = A.getBoundingClientRect(), b = board.getBoundingClientRect();
+  const b2 = B.getBoundingClientRect();
+  
+  const centerA = { x: a.left - b.left + a.width/2, y: a.top - b.top + a.height/2 };
+  const centerB = { x: b2.left - b.left + b2.width/2, y: b2.top - b.top + b2.height/2 };
+  
+  const dx = centerB.x - centerA.x;
+  const dy = centerB.y - centerA.y;
+  
+  if (dx === 0 && dy === 0) return centerB;
+  
+  // Половины размеров блока B
+  const halfWidth = b2.width / 2;
+  const halfHeight = b2.height / 2;
+  
+  // Нахождение пересечения с прямоугольной границей
+  // Ищем ближайшую точку пересечения в направлении от A к B
+  let t = Infinity;
+  
+  if (Math.abs(dx) > 0.001) {
+    // Проверяем пересечение с левыми и правыми границами
+    const tLeft = (-halfWidth) / dx;
+    const tRight = (halfWidth) / dx;
+    
+    // Берем ближайшую положительную t
+    if (tLeft > 0 && tLeft < t) t = tLeft;
+    if (tRight > 0 && tRight < t) t = tRight;
+  }
+  
+  if (Math.abs(dy) > 0.001) {
+    // Проверяем пересечение с верхними и нижними границами
+    const tTop = (-halfHeight) / dy;
+    const tBottom = (halfHeight) / dy;
+    
+    // Берем ближайшую положительную t
+    if (tTop > 0 && tTop < t) t = tTop;
+    if (tBottom > 0 && tBottom < t) t = tBottom;
+  }
+  
+  // Если не нашли пересечение, используем центр
+  if (t === Infinity) t = 0;
+  
+  // Вычисляем точку пересечения относительно центра блока B
+  const intersectionX = centerB.x + t * dx;
+  const intersectionY = centerB.y + t * dy;
+  
+  return { x: intersectionX, y: intersectionY };
+}
+
+// прямая линия со стрелкой ->
+function straightWithArrow(A,B, customLength = 30){
+  const p1 = center(A);
+  const p2 = center(B);
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const angle = Math.atan2(dy, dx);
+  
+  // Точка на фиксированном расстоянии от центра блока B
+  const arrowDistance = customLength;
+  const arrowX = p2.x - Math.cos(angle) * arrowDistance;
+  const arrowY = p2.y - Math.sin(angle) * arrowDistance;
+  
+  // Основная линия до точки стрелки
+  const d = `M ${p1.x} ${p1.y} L ${arrowX} ${arrowY}`;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke','var(--stroke)');
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-opacity','0.95');
+  
+  // Стрелка
+  const arrowPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+  const arrowD = `M ${arrowX} ${arrowY} L ${arrowX - 10 * Math.cos(angle - Math.PI/6)} ${arrowY - 10 * Math.sin(angle - Math.PI/6)} M ${arrowX} ${arrowY} L ${arrowX - 10 * Math.cos(angle + Math.PI/6)} ${arrowY - 10 * Math.sin(angle + Math.PI/6)}`;
+  arrowPath.setAttribute('d', arrowD);
+  arrowPath.setAttribute('stroke','var(--stroke)');
+  arrowPath.setAttribute('stroke-width','2');
+  arrowPath.setAttribute('stroke-linecap','round');
+  arrowPath.setAttribute('fill','none');
+  arrowPath.setAttribute('stroke-opacity','0.95');
+  
+  return [path, arrowPath];
+}
+
+// L-образная линия со стрелкой ->
+function lShapeReverseWithArrow(A,B, customLength = 30){
+  const p1 = center(A);
+  const p2 = center(B);
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const angle = Math.atan2(dy, dx);
+  
+  // Точка на фиксированном расстоянии от центра блока B
+  const arrowDistance = customLength;
+  const arrowX = p2.x - Math.cos(angle) * arrowDistance;
+  const arrowY = p2.y - Math.sin(angle) * arrowDistance;
+  
+  // L-образная линия до точки стрелки
+  const d = `M ${p1.x} ${p1.y} L ${p1.x} ${arrowY} L ${arrowX} ${arrowY}`;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke','var(--stroke)');
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-opacity','0.95');
+  
+  // Стрелка
+  const arrowPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+  const arrowD = `M ${arrowX} ${arrowY} L ${arrowX - 10 * Math.cos(angle - Math.PI/6)} ${arrowY - 10 * Math.sin(angle - Math.PI/6)} M ${arrowX} ${arrowY} L ${arrowX - 10 * Math.cos(angle + Math.PI/6)} ${arrowY - 10 * Math.sin(angle + Math.PI/6)}`;
+  arrowPath.setAttribute('d', arrowD);
+  arrowPath.setAttribute('stroke','var(--stroke)');
+  arrowPath.setAttribute('stroke-width','2');
+  arrowPath.setAttribute('stroke-linecap','round');
+  arrowPath.setAttribute('fill','none');
+  arrowPath.setAttribute('stroke-opacity','0.95');
+  
+  return [path, arrowPath];
+}
+
+function draw(){
+  const r = board.getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${r.width} ${r.height}`);
+  svg.setAttribute('width', r.width);
+  svg.setAttribute('height', r.height);
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  
+  // Настройка длин стрелок для каждого соединения
+  const arrowLengths = {
+    'center-q1': 115,
+    'center-w1': 69,
+    'center-e1': 56,
+    'center-r1': 110,
+    'q1-q2': 50,
+    'w1-w2': 50,
+    'center-a1': 115,
+    'center-s1': 73,
+    'center-d1': 57,
+    'center-f1': 113,
+    'a2-z1': 87,
+    's2-z1': 81,
+    'z1-x1': 97,
+    'z1-c1':60,
+    'z1-v1': 97,
+    'f2-f3': 61,
+    'f3-f4': 40
+  };
+  
+  edges.forEach(([a,b])=>{
+    const A = document.getElementById(a), B = document.getElementById(b);
+    if (A && B) {
+      // Соединения со стрелками ->
+      const arrowConnections = [
+        ['center','q1'], ['center','w1'], ['center','e1'], ['center','r1'],
+        ['q1','q2'], ['w1','w2'],
+        ['center','a1'], ['center','s1'], ['center','d1'], ['center','f1'],
+        ['a2','z1'], ['s2','z1'],
+        ['z1','x1'], ['z1','c1'], ['z1','v1'],
+        ['f2','f3'], ['f3','f4']
+      ];
+      
+      if (arrowConnections.some(conn => conn[0] === a && conn[1] === b)) {
+        // Получаем кастомную длину для этого соединения
+        const connectionKey = `${a}-${b}`;
+        const customLength = arrowLengths[connectionKey] || 30; // по умолчанию 30
+        
+        // Используем линии со стрелками с кастомной длиной
+        if (a === 'd2' && b === 'v2') {
+          const [path, arrow] = lShapeReverseWithArrow(A,B, customLength);
+          svg.appendChild(path);
+          svg.appendChild(arrow);
+        } else {
+          const [path, arrow] = straightWithArrow(A,B, customLength);
+          svg.appendChild(path);
+          svg.appendChild(arrow);
+        }
+      } else {
+        // Обычные соединения без стрелок
+        if (a === 'd2' && b === 'v2') {
+          svg.appendChild(lShapeReverse(A,B));
+        } else {
+          svg.appendChild(straight(A,B));
+        }
+      }
+    }
+  });
+}
+
+window.addEventListener('load', draw);
+window.addEventListener('resize', draw);
+new ResizeObserver(draw).observe(board);
+</script>
+</body>
+</html>
